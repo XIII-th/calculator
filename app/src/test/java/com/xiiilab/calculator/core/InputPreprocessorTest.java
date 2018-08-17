@@ -1,5 +1,7 @@
 package com.xiiilab.calculator.core;
 
+import com.xiiilab.calculator.core.operator.BinaryOperator;
+import com.xiiilab.calculator.core.operator.UnaryOperator;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -11,10 +13,20 @@ import java.util.function.Function;
  */
 public class InputPreprocessorTest {
 
+    private static final TokenProcessor TOKEN_PROCESSOR;
+
+    static {
+        TOKEN_PROCESSOR = new TokenProcessor();
+        TOKEN_PROCESSOR.
+                addOperators(BinaryOperator.values()).
+                addOperators(UnaryOperator.values()).
+                addIgnoredCharacters('(', ')');
+    }
+
     private static final Random RANDOM = new Random();
     private static final char[] SPACE_CHARS = {' ', '\t', '\n'};
     private static final byte MAX_SPACE_COUNT = 5;
-    private static final InputPreprocessor INPUT_PREPROCESSOR = new InputPreprocessor();
+    private static final InputPreprocessor INPUT_PREPROCESSOR = new InputPreprocessor(TOKEN_PROCESSOR);
 
     @Test(expected = IllegalArgumentException.class)
     public void removeSpaces_emptyString() {
@@ -84,9 +96,9 @@ public class InputPreprocessorTest {
     private void expressionTest(String expression, Function<String, String[]> f) {
         String[] tokens = trivialSplit(expression);
         expression = expressionComposer(tokens);
-        log("Test with expression '" + expression + '\'');
+        System.out.print("Test with expression '" + expression + '\'');
         Assert.assertArrayEquals(tokens, f.apply(expression));
-        log("Test with expression '" + expression + " PASSED");
+        System.out.println(" --> PASSED");
     }
 
     private String[] trivialSplit(String expression) {
@@ -106,10 +118,5 @@ public class InputPreprocessorTest {
     private void appendSpaces(StringBuilder expression) {
         for (byte i = 0, limit = (byte) RANDOM.nextInt(MAX_SPACE_COUNT); i < limit; i++)
             expression.append(SPACE_CHARS[RANDOM.nextInt(SPACE_CHARS.length - 1)]);
-    }
-
-    private void log(String message) {
-        // TODO: use logger
-        System.out.println(message);
     }
 }
