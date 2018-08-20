@@ -2,11 +2,12 @@ package com.xiiilab.calculator.core;
 
 import com.xiiilab.calculator.core.operator.BinaryOperator;
 import com.xiiilab.calculator.core.operator.UnaryOperator;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Random;
 import java.util.function.Function;
+
+import static org.junit.Assert.*;
 
 /**
  * Created by XIII-th on 15.08.2018
@@ -36,7 +37,7 @@ public class InputPreprocessorTest {
     @Test
     public void removeSpaces() {
         String result = INPUT_PREPROCESSOR.removeSpaces("\t1 2 \r\n 3 4    56    7  8 \t \n 9\t0   \t");
-        Assert.assertEquals("1234567890", result);
+        assertEquals("1234567890", result);
     }
 
     @Test
@@ -97,7 +98,7 @@ public class InputPreprocessorTest {
         String[] tokens = trivialSplit(expression);
         expression = expressionComposer(tokens);
         System.out.print("Test with expression '" + expression + '\'');
-        Assert.assertArrayEquals(tokens, f.apply(expression));
+        assertArrayEquals(tokens, f.apply(expression));
         System.out.println(" --> PASSED");
     }
 

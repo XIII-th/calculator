@@ -31,4 +31,10 @@ public enum UnaryOperator implements IUnaryOperator {
     public byte getPriority() {
         return mPriority;
     }
+
+
+    @Override
+    public String toString() {
+        return getSymbol() + "u";
+    }
 }

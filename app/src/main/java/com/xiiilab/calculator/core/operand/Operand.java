@@ -20,4 +20,24 @@ public class Operand implements IOperand {
     public byte getPriority() {
         return 0;
     }
+
+    @Override
+    public String toString() {
+        return String.valueOf(mValue);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Operand)) return false;
+
+        Operand operand = (Operand) o;
+
+        return Float.compare(operand.mValue, mValue) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return (mValue != +0.0f ? Float.floatToIntBits(mValue) : 0);
+    }
 }

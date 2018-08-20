@@ -49,4 +49,10 @@ public enum BinaryOperator implements IBinaryOperator {
     public byte getPriority() {
         return mPriority;
     }
+
+
+    @Override
+    public String toString() {
+        return getSymbol() + "b";
+    }
 }
