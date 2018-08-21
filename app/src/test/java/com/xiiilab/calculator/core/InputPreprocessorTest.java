@@ -1,6 +1,7 @@
 package com.xiiilab.calculator.core;
 
 import com.xiiilab.calculator.core.operator.BinaryOperator;
+import com.xiiilab.calculator.core.operator.Bracket;
 import com.xiiilab.calculator.core.operator.UnaryOperator;
 import org.junit.Test;
 
@@ -21,7 +22,7 @@ public class InputPreprocessorTest {
         TOKEN_PROCESSOR.
                 addOperators(BinaryOperator.values()).
                 addOperators(UnaryOperator.values()).
-                addIgnoredCharacters('(', ')');
+                addOperators(Bracket.values());
     }
 
     private static final Random RANDOM = new Random();

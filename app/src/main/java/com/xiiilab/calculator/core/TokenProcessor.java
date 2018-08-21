@@ -1,7 +1,9 @@
 package com.xiiilab.calculator.core;
 
+import com.xiiilab.calculator.core.operand.IOperand;
 import com.xiiilab.calculator.core.operand.Operand;
-import com.xiiilab.calculator.core.operator.IBinaryOperator;
+import com.xiiilab.calculator.core.operator.Bracket;
+import com.xiiilab.calculator.core.operator.IOperator;
 import com.xiiilab.calculator.core.operator.IUnaryOperator;
 
 import java.util.*;
@@ -11,20 +13,18 @@ import java.util.*;
  */
 public class TokenProcessor {
 
-    private final Map<Character, IBinaryOperator> mIBinaryOperatorMap;
+    private final Map<Character, IOperator> mOperatorMap;
     private final Map<Character, IUnaryOperator> mIUnaryOperatorMap;
-    private final Set<Character> mIgnoredTokens;
 
     public TokenProcessor() {
-        mIBinaryOperatorMap = new HashMap<>();
+        mOperatorMap = new HashMap<>();
         mIUnaryOperatorMap = new HashMap<>();
-        mIgnoredTokens = new HashSet<>();
     }
 
-    public TokenProcessor addOperators(IBinaryOperator... operators) {
-        for (IBinaryOperator operator : operators)
-            if (mIBinaryOperatorMap.put(operator.getSymbol(), operator) != null)
-                throw new IllegalArgumentException("Unexpected duplication of binary operator " + operator.getSymbol());
+    public TokenProcessor addOperators(IOperator... operators) {
+        for (IOperator operator : operators)
+            if (mOperatorMap.put(operator.getSymbol(), operator) != null)
+                throw new IllegalArgumentException("Unexpected duplication of operator " + operator.getSymbol());
         return this;
     }
 
@@ -35,34 +35,58 @@ public class TokenProcessor {
         return this;
     }
 
-    public TokenProcessor addIgnoredCharacters(Character... chars) {
-        mIgnoredTokens.addAll(Arrays.asList(chars));
-        return this;
-    }
-
     public Set<Character> getSupportedOperators() {
-        // add ignored characters as supported tokens
-        Set<Character> characterSet = new HashSet<>(mIgnoredTokens);
         // add all binary operators as tokens
-        characterSet.addAll(mIBinaryOperatorMap.keySet());
+        Set<Character> characterSet = new HashSet<>(mOperatorMap.keySet());
         // and unary operators
         characterSet.addAll(mIUnaryOperatorMap.keySet());
         return characterSet;
     }
 
-    public List<IToken> toTokenList(String... tokenArray) {
+    protected Queue<IToken> toRpn(List<IToken> tokens) {
+        Queue<IToken> out = new LinkedList<>();
+        Deque<IToken> stack = new LinkedList<>();
+        // https://en.wikipedia.org/wiki/Shunting-yard_algorithm#The_algorithm_in_detail
+        for (IToken token : tokens) {
+            if (token instanceof IOperand)
+                out.add(token);
+            else if (token == Bracket.LEFT)
+                stack.add(token);
+            else if (token == Bracket.RIGHT) {
+                IToken op;
+                // TODO: issue with empty brackets
+                while ((op = stack.pollLast()) != Bracket.LEFT && !stack.isEmpty())
+                    out.add(op);
+                if (op != Bracket.LEFT)
+                    throw new IllegalStateException("Unable to obtain open bracket");
+            }
+            else if (token instanceof IOperator) {
+                IToken op;
+                while ((op = stack.peekLast()) != null && op.getPriority() >= token.getPriority() && op != Bracket.LEFT)
+                    out.add(stack.pollLast());
+                stack.add(token);
+            }
+        }
+        IToken token;
+        while ((token = stack.pollLast()) != null)
+            if (token == Bracket.LEFT)
+                throw new IllegalStateException("Unable to obtain open bracket");
+            else
+                out.add(token);
+        return out;
+    }
+
+    protected List<IToken> toTokenList(String... tokenArray) {
         List<IToken> tokenList = new LinkedList<>();
         for (int ptr = 0; ptr < tokenArray.length; ptr++) {
             String tokenStr = tokenArray[ptr];
             if (tokenStr.length() == 1) {
                 Character c = tokenStr.charAt(0);
-                if (mIgnoredTokens.contains(c))
-                    continue;
                 IToken token = null;
                 if (mIUnaryOperatorMap.containsKey(c))
                     token = getUnaryOperator(mIUnaryOperatorMap.get(c), tokenArray, ptr);
                 if (token == null)
-                    token = mIBinaryOperatorMap.get(c);
+                    token = mOperatorMap.get(c);
                 if (token == null)
                     token = new Operand(tokenStr);
                 tokenList.add(token);
