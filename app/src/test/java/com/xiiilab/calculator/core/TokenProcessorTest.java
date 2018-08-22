@@ -1,10 +1,13 @@
 package com.xiiilab.calculator.core;
 
-import com.xiiilab.calculator.core.operand.Operand;
 import com.xiiilab.calculator.core.operator.*;
 import org.junit.Test;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Supplier;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -14,7 +17,14 @@ import static org.junit.Assert.assertNull;
  */
 public class TokenProcessorTest {
 
-    private static final String[] TOKEN_ARRAY = {"1.1", "+", "(", "-", "2", "*", "3.", ")", "/", "4.4"};
+    private static final Supplier<TokenProcessor> TOKEN_PROCESSOR_SUPPLIER = () -> {
+        TokenProcessor processor = new TokenProcessor();
+        processor.
+                addOperators(BinaryOperator.values()).
+                addOperators(Bracket.values()).
+                addOperators(UnaryOperator.values());
+        return processor;
+    };
 
     @Test
     public void addBinaryOperators() {
@@ -62,50 +72,24 @@ public class TokenProcessorTest {
 
     @Test
     public void toRpn_simple() {
-        TokenProcessor processor = new TokenProcessor();
-        processor.
-                addOperators(BinaryOperator.values()).
-                addOperators(UnaryOperator.values()).
-                addOperators(Bracket.values());
-        List<IToken> tokenList = processor.toTokenList("3 + 4 * 2 / ( 1 - 5 ) + 3 * 5".split("\\s"));
-        Queue<IToken> expected = new LinkedList<>(), actual = processor.toRpn(tokenList);
-        //3 4 2 * 1 5 - / + 3 5 * +
-        expected.add(new Operand("3"));
-        expected.add(new Operand("4"));
-        expected.add(new Operand("2"));
-        expected.add(BinaryOperator.MULTIPLY);
-        expected.add(new Operand("1"));
-        expected.add(new Operand("5"));
-        expected.add(BinaryOperator.MINUS);
-        expected.add(BinaryOperator.DIVIDE);
-        expected.add(BinaryOperator.PLUS);
-        expected.add(new Operand("3"));
-        expected.add(new Operand("5"));
-        expected.add(BinaryOperator.MULTIPLY);
-        expected.add(BinaryOperator.PLUS);
-        assertEquals(expected, actual);
+        TokenProcessor processor = TOKEN_PROCESSOR_SUPPLIER.get();
+        List<IToken> tokenList = processor.toTokenList(Samples.SAMPLE_2_SPLIT_EXPRESSION.get());
+        assertEquals(Samples.SAMPLE_2_TOKEN_EXPRESSION.get(), processor.toRpn(tokenList));
+    }
+
+    @Test
+    public void toRpn_doubleBracket() {
+        TokenProcessor processor = TOKEN_PROCESSOR_SUPPLIER.get();
+        // sample from https://habr.com/post/100869/
+        List<IToken> tokenList = processor.toTokenList(Samples.SAMPLE_3_SPLIT_EXPRESSION.get());
+        assertEquals(Samples.SAMPLE_3_TOKEN_EXPRESSION.get(), processor.toRpn(tokenList));
     }
 
     @Test
     public void toTokenList() {
-        TokenProcessor processor = new TokenProcessor();
-        processor.
-                addOperators(BinaryOperator.values()).
-                addOperators(Bracket.values()).
-                addOperators(UnaryOperator.values());
-        List<IToken> actual = processor.toTokenList(TOKEN_ARRAY),
-                expected = new LinkedList<>();
-        expected.add(new Operand("1.1"));
-        expected.add(BinaryOperator.PLUS);
-        expected.add(Bracket.LEFT);
-        expected.add(UnaryOperator.MINUS);
-        expected.add(new Operand("2"));
-        expected.add(BinaryOperator.MULTIPLY);
-        expected.add(new Operand("3."));
-        expected.add(Bracket.RIGHT);
-        expected.add(BinaryOperator.DIVIDE);
-        expected.add(new Operand("4.4"));
-        assertEquals(expected, actual);
+        TokenProcessor processor = TOKEN_PROCESSOR_SUPPLIER.get();
+        List<IToken> tokenList = processor.toTokenList(Samples.SAMPLE_1_SPLIT_EXPRESSION.get());
+        assertEquals(Samples.SAMPLE_1_TOKEN_EXPRESSION.get(), tokenList);
     }
 
     @Test
@@ -134,7 +118,7 @@ public class TokenProcessorTest {
         if (operators instanceof IBinaryOperator[])
             processor.addOperators((IBinaryOperator[]) operators);
         else if (operators instanceof IUnaryOperator[])
-            processor.addOperators((IUnaryOperator[])operators);
+            processor.addOperators((IUnaryOperator[]) operators);
         else
             throw new IllegalArgumentException("Unexpected operators array type " + operators.getClass());
         Set<Character> expected = new HashSet<>();

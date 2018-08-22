@@ -8,4 +8,6 @@ import com.xiiilab.calculator.core.IToken;
 public interface IOperand extends IToken {
 
     float getValue();
+
+    void setValue(float v);
 }

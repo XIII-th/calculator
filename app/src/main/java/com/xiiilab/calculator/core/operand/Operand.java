@@ -5,7 +5,7 @@ package com.xiiilab.calculator.core.operand;
  */
 public class Operand implements IOperand {
 
-    private final float mValue;
+    private float mValue;
 
     public Operand(String numberString) throws NumberFormatException {
         mValue = Float.parseFloat(numberString);
@@ -14,6 +14,11 @@ public class Operand implements IOperand {
     @Override
     public float getValue() {
         return mValue;
+    }
+
+    @Override
+    public void setValue(float v) {
+        mValue = v;
     }
 
     @Override
