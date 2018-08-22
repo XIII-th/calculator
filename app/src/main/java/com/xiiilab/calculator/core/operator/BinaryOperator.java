@@ -21,7 +21,7 @@ public enum BinaryOperator implements IBinaryOperator {
     MULTIPLY('*', 2) {
         @Override
         public float apply(IOperand o1, IOperand o2) {
-            return o1.getValue() + o2.getValue();
+            return o1.getValue() * o2.getValue();
         }
     },
     DIVIDE('/', 2) {

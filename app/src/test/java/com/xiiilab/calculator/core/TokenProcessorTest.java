@@ -1,12 +1,10 @@
 package com.xiiilab.calculator.core;
 
+import com.xiiilab.calculator.core.operand.Operand;
 import com.xiiilab.calculator.core.operator.*;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Supplier;
 
 import static org.junit.Assert.assertEquals;
@@ -71,14 +69,21 @@ public class TokenProcessorTest {
     }
 
     @Test
-    public void toRpn_simple() {
+    public void toRpn_sample1() {
+        TokenProcessor processor = TOKEN_PROCESSOR_SUPPLIER.get();
+        List<IToken> tokenList = processor.toTokenList(Samples.SAMPLE_1_SPLIT_EXPRESSION.get());
+        assertEquals(Samples.SAMPLE_1_TOKEN_EXPRESSION.get(), processor.toRpn(tokenList));
+    }
+
+    @Test
+    public void toRpn_sample2() {
         TokenProcessor processor = TOKEN_PROCESSOR_SUPPLIER.get();
         List<IToken> tokenList = processor.toTokenList(Samples.SAMPLE_2_SPLIT_EXPRESSION.get());
         assertEquals(Samples.SAMPLE_2_TOKEN_EXPRESSION.get(), processor.toRpn(tokenList));
     }
 
     @Test
-    public void toRpn_doubleBracket() {
+    public void toRpn_sample3() {
         TokenProcessor processor = TOKEN_PROCESSOR_SUPPLIER.get();
         // sample from https://habr.com/post/100869/
         List<IToken> tokenList = processor.toTokenList(Samples.SAMPLE_3_SPLIT_EXPRESSION.get());
@@ -86,10 +91,28 @@ public class TokenProcessorTest {
     }
 
     @Test
+    public void toRpn_sample4() {
+        TokenProcessor processor = TOKEN_PROCESSOR_SUPPLIER.get();
+        List<IToken> tokenList = processor.toTokenList(Samples.SAMPLE_4_SPLIT_EXPRESSION.get());
+        assertEquals(Samples.SAMPLE_4_TOKEN_EXPRESSION.get(), processor.toRpn(tokenList));
+    }
+
+    @Test
     public void toTokenList() {
         TokenProcessor processor = TOKEN_PROCESSOR_SUPPLIER.get();
-        List<IToken> tokenList = processor.toTokenList(Samples.SAMPLE_1_SPLIT_EXPRESSION.get());
-        assertEquals(Samples.SAMPLE_1_TOKEN_EXPRESSION.get(), tokenList);
+        List<IToken> actual = processor.toTokenList(Samples.SAMPLE_1_SPLIT_EXPRESSION.get());
+        List<IToken> expected = new LinkedList<>();
+        expected.add(new Operand("1.1"));
+        expected.add(BinaryOperator.PLUS);
+        expected.add(Bracket.LEFT);
+        expected.add(UnaryOperator.MINUS);
+        expected.add(new Operand("2.0"));
+        expected.add(BinaryOperator.MINUS);
+        expected.add(new Operand("3.0"));
+        expected.add(Bracket.RIGHT);
+        expected.add(BinaryOperator.DIVIDE);
+        expected.add(new Operand("5.0"));
+        assertEquals(expected, actual);
     }
 
     @Test

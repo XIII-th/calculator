@@ -98,9 +98,7 @@ public class InputPreprocessorTest {
     private void expressionTest(String expression, Function<String, String[]> f) {
         String[] tokens = trivialSplit(expression);
         expression = expressionComposer(tokens);
-        System.out.print("Test with expression '" + expression + '\'');
         assertArrayEquals(tokens, f.apply(expression));
-        System.out.println(" --> PASSED");
     }
 
     private String[] trivialSplit(String expression) {

@@ -2,7 +2,6 @@ package com.xiiilab.calculator.core;
 
 import com.xiiilab.calculator.core.operand.Operand;
 import com.xiiilab.calculator.core.operator.BinaryOperator;
-import com.xiiilab.calculator.core.operator.Bracket;
 import com.xiiilab.calculator.core.operator.UnaryOperator;
 
 import java.util.LinkedList;
@@ -14,20 +13,19 @@ import java.util.function.Supplier;
  */
 class Samples {
 
-    public static final Supplier<String> SAMPLE_1_EXPRESSION = () -> "1.1 + ( - 2 * 3. ) / 4.4";
+    public static final Supplier<String> SAMPLE_1_EXPRESSION = () -> "1.1 + ( - 2 - 3.0 ) / 5.0";
     public static final Supplier<String[]> SAMPLE_1_SPLIT_EXPRESSION = () -> SAMPLE_1_EXPRESSION.get().split("\\s");
     public static final Supplier<Queue<IToken>> SAMPLE_1_TOKEN_EXPRESSION = () -> {
         Queue<IToken> tokenQueue = new LinkedList<>();
+        // 1.1 2 - 3. - 4.4 / +
         tokenQueue.add(new Operand("1.1"));
-        tokenQueue.add(BinaryOperator.PLUS);
-        tokenQueue.add(Bracket.LEFT);
-        tokenQueue.add(UnaryOperator.MINUS);
         tokenQueue.add(new Operand("2"));
-        tokenQueue.add(BinaryOperator.MULTIPLY);
-        tokenQueue.add(new Operand("3."));
-        tokenQueue.add(Bracket.RIGHT);
+        tokenQueue.add(UnaryOperator.MINUS);
+        tokenQueue.add(new Operand("3.0"));
+        tokenQueue.add(BinaryOperator.MINUS);
+        tokenQueue.add(new Operand("5.0"));
         tokenQueue.add(BinaryOperator.DIVIDE);
-        tokenQueue.add(new Operand("4.4"));
+        tokenQueue.add(BinaryOperator.PLUS);
         return tokenQueue;
     };
 
@@ -70,6 +68,23 @@ class Samples {
         tokenQueue.add(new Operand("4"));
         tokenQueue.add(BinaryOperator.MINUS);
         tokenQueue.add(BinaryOperator.DIVIDE);
+        return tokenQueue;
+    };
+
+    public static final Supplier<String> SAMPLE_4_EXPRESSION = () -> "( - 8 + ( - ( ( - 2 ) * ( - 5 ) ) ) )";
+    public static final Supplier<String[]> SAMPLE_4_SPLIT_EXPRESSION = () -> SAMPLE_4_EXPRESSION.get().split("\\s");
+    public static final Supplier<Queue<IToken>> SAMPLE_4_TOKEN_EXPRESSION = () -> {
+        Queue<IToken> tokenQueue = new LinkedList<>();
+        // 8 - 2 - 5 - * - +
+        tokenQueue.add(new Operand("8"));
+        tokenQueue.add(UnaryOperator.MINUS);
+        tokenQueue.add(new Operand("2"));
+        tokenQueue.add(UnaryOperator.MINUS);
+        tokenQueue.add(new Operand("5"));
+        tokenQueue.add(UnaryOperator.MINUS);
+        tokenQueue.add(BinaryOperator.MULTIPLY);
+        tokenQueue.add(UnaryOperator.MINUS);
+        tokenQueue.add(BinaryOperator.PLUS);
         return tokenQueue;
     };
 }
