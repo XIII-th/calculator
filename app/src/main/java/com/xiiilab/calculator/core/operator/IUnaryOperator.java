@@ -7,5 +7,5 @@ import com.xiiilab.calculator.core.operand.IOperand;
  */
 public interface IUnaryOperator extends IOperator {
 
-    float apply(IOperand o);
+    double apply(IOperand o);
 }

@@ -1,29 +1,32 @@
 package com.xiiilab.calculator.vm;
 
+import android.app.Application;
+import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.ViewModel;
+import android.support.annotation.StringRes;
 import com.xiiilab.calculator.AsyncCalculator;
+import com.xiiilab.calculator.R;
+import com.xiiilab.calculator.core.CalculatorException;
 
 /**
  * Created by XIII-th on 23.08.2018
  */
-public class CalculatorViewModel extends ViewModel {
+public class CalculatorViewModel extends AndroidViewModel implements AsyncCalculator.CalculationListener {
 
     private final MutableLiveData<String> mExpressionError;
     private final MutableLiveData<String> mResult;
     private final MutableLiveData<Boolean> mInProgress;
     private final AsyncCalculator mCalculator;
-    private final CalculationResultListener mCalculationListener;
 
     private String mExpression;
 
-    public CalculatorViewModel() {
+    public CalculatorViewModel(Application application) {
+        super(application);
         mExpressionError = new MutableLiveData<>();
         mResult = new MutableLiveData<>();
         mInProgress = new MutableLiveData<>();
         mCalculator = new AsyncCalculator();
-        mCalculationListener = new CalculationResultListener(mExpressionError, mResult, mInProgress);
     }
 
     public String getExpression() {
@@ -47,11 +50,57 @@ public class CalculatorViewModel extends ViewModel {
     }
 
     public void calculate() {
-        mCalculator.calculate(getExpression(), mCalculationListener);
+        String expression = getExpression();
+        if (expression != null && !expression.isEmpty())
+            mCalculator.calculate(expression, this);
     }
 
     @Override
     protected void onCleared() {
         mCalculator.shutdown();
+    }
+
+    @Override
+    public void onStart() {
+        mExpressionError.postValue(null);
+        mResult.postValue(null);
+        mInProgress.postValue(Boolean.TRUE);
+    }
+
+    @Override
+    public void onError(Exception e) {
+        String message;
+        if (e instanceof CalculatorException) {
+            CalculatorException.Type type = ((CalculatorException) e).mType;
+            switch (type) {
+                case NUMBER_FORMAT:
+                    message = error(R.string.number_format_error, e);
+                    break;
+                case BRACKET_MISMATCH:
+                    message = error(R.string.bracket_mismatch, e);
+                    break;
+                case EMPTY_BRACKET:
+                    message = error(R.string.empty_bracket, e);
+                    break;
+                case OPERATOR_BALANCE:
+                    message = error(R.string.operator_balance, e);
+                    break;
+                default:
+                    message = error(R.string.unexpected_error, e);
+            }
+        } else
+            message = error(R.string.unexpected_error, e);
+        mExpressionError.postValue(message);
+        mInProgress.postValue(Boolean.FALSE);
+    }
+
+    @Override
+    public void onStop(double result) {
+        mResult.postValue(String.valueOf(result));
+        mInProgress.postValue(Boolean.FALSE);
+    }
+
+    private String error(@StringRes int id, Exception e) {
+        return getApplication().getString(id, e.getLocalizedMessage());
     }
 }

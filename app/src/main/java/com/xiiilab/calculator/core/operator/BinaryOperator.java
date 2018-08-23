@@ -8,25 +8,25 @@ import com.xiiilab.calculator.core.operand.IOperand;
 public enum BinaryOperator implements IBinaryOperator {
     PLUS('+', 1) {
         @Override
-        public float apply(IOperand o1, IOperand o2) {
+        public double apply(IOperand o1, IOperand o2) {
             return o1.getValue() + o2.getValue();
         }
     },
     MINUS('-', 1) {
         @Override
-        public float apply(IOperand o1, IOperand o2) {
+        public double apply(IOperand o1, IOperand o2) {
             return o1.getValue() - o2.getValue();
         }
     },
     MULTIPLY('*', 2) {
         @Override
-        public float apply(IOperand o1, IOperand o2) {
+        public double apply(IOperand o1, IOperand o2) {
             return o1.getValue() * o2.getValue();
         }
     },
     DIVIDE('/', 2) {
         @Override
-        public float apply(IOperand o1, IOperand o2) {
+        public double apply(IOperand o1, IOperand o2) {
             return o1.getValue() / o2.getValue();
         }
     };

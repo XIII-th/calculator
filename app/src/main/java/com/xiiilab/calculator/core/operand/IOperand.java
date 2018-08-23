@@ -7,7 +7,7 @@ import com.xiiilab.calculator.core.IToken;
  */
 public interface IOperand extends IToken {
 
-    float getValue();
+    double getValue();
 
-    void setValue(float v);
+    void setValue(double v);
 }

@@ -13,7 +13,7 @@ import java.util.Queue;
  */
 public class Calculator {
 
-    public float calculate(Queue<IToken> rpnExpression) {
+    public double calculate(Queue<IToken> rpnExpression) {
         Deque<IOperand> stack = new LinkedList<>();
         while (!rpnExpression.isEmpty()) {
             IToken token = rpnExpression.poll();

@@ -9,6 +9,7 @@ import java.util.function.Supplier;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 /**
  * Created by XIII-th on 17.08.2018
@@ -135,6 +136,57 @@ public class TokenProcessorTest {
         assertNull(getUnaryOperator(2, "2", "+", "-", "1"));
     }
 
+    @Test(expected = CalculatorException.class)
+    public void emptyBracketTest() {
+        try {
+            List<IToken> tokenList = new LinkedList<>();
+            tokenList.add(new Operand("1"));
+            tokenList.add(BinaryOperator.PLUS);
+            tokenList.add(Bracket.LEFT);
+            tokenList.add(Bracket.RIGHT);
+            tokenList.add(BinaryOperator.PLUS);
+            tokenList.add(new Operand("1"));
+            TOKEN_PROCESSOR_SUPPLIER.get().checkBrackets(tokenList);
+        } catch (CalculatorException e) {
+            if (e.mType != CalculatorException.Type.EMPTY_BRACKET)
+                fail("Unexpected error type " + e.mType);
+            throw e;
+        }
+    }
+
+    @Test(expected = CalculatorException.class)
+    public void bracketMismatchTest() {
+        try {
+            List<IToken> tokenList = new LinkedList<>();
+            tokenList.add(new Operand("1"));
+            tokenList.add(BinaryOperator.PLUS);
+            tokenList.add(Bracket.RIGHT);
+            tokenList.add(Bracket.LEFT);
+            tokenList.add(BinaryOperator.PLUS);
+            tokenList.add(new Operand("1"));
+            TOKEN_PROCESSOR_SUPPLIER.get().checkBrackets(tokenList);
+        } catch (CalculatorException e) {
+            if (e.mType != CalculatorException.Type.BRACKET_MISMATCH)
+                fail("Unexpected error type " + e.mType);
+            throw e;
+        }
+    }
+
+    @Test(expected = CalculatorException.class)
+    public void operatorBalance() {
+        try {
+            List<IToken> tokenList = new LinkedList<>();
+            tokenList.add(new Operand("1"));
+            tokenList.add(BinaryOperator.PLUS);
+            tokenList.add(BinaryOperator.PLUS);
+            tokenList.add(new Operand("1"));
+            TOKEN_PROCESSOR_SUPPLIER.get().checkOperatorBalance(tokenList);
+        } catch (CalculatorException e) {
+            if (e.mType != CalculatorException.Type.OPERATOR_BALANCE)
+                fail("Unexpected error type " + e.mType);
+            throw e;
+        }
+    }
 
     private void addOperatorsTest(IOperator... operators) {
         TokenProcessor processor = new TokenProcessor();

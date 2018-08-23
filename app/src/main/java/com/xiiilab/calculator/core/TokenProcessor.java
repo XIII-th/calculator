@@ -2,6 +2,7 @@ package com.xiiilab.calculator.core;
 
 import com.xiiilab.calculator.core.operand.IOperand;
 import com.xiiilab.calculator.core.operand.Operand;
+import com.xiiilab.calculator.core.operator.BinaryOperator;
 import com.xiiilab.calculator.core.operator.Bracket;
 import com.xiiilab.calculator.core.operator.IOperator;
 import com.xiiilab.calculator.core.operator.IUnaryOperator;
@@ -44,7 +45,10 @@ public class TokenProcessor {
     }
 
     public Queue<IToken> toRpn(String... tokens) {
-        return toRpn(toTokenList(tokens));
+        List<IToken> tokenList = toTokenList(tokens);
+        checkBrackets(tokenList);
+        checkOperatorBalance(tokenList);
+        return toRpn(tokenList);
     }
 
     protected Queue<IToken> toRpn(List<IToken> tokens) {
@@ -107,11 +111,43 @@ public class TokenProcessor {
         // start or end of expression
         if (ptr == 0 || ptr == tokenArray.length - 1)
             return null;
-        String prev = tokenArray[ptr - 1];
+        String prev = tokenArray[ptr - 1], next = tokenArray[ptr + 1];
         // previous token is operand
         if (prev.length() > 1)
             return null;
         Character c = prev.charAt(0);
-        return c == '(' ? operator : null;
+        return c == '(' && next.matches("^[0-9.(]+$") ? operator : null;
+    }
+
+    protected void checkBrackets(List<IToken> tokenList) {
+        int counter = 0;
+        IToken prev = null;
+        for (IToken token : tokenList) {
+            if (token == Bracket.LEFT)
+                counter ++;
+            else if (token == Bracket.RIGHT) {
+                if (prev == Bracket.LEFT)
+                    throw new CalculatorException(CalculatorException.Type.EMPTY_BRACKET);
+                counter--;
+            }
+            prev = token;
+            if (counter < 0)
+                throw new CalculatorException(CalculatorException.Type.BRACKET_MISMATCH);
+        }
+        if (counter > 0)
+            throw new CalculatorException(CalculatorException.Type.BRACKET_MISMATCH);
+    }
+
+    protected void checkOperatorBalance(List<IToken> tokenList) {
+        int balance = 0;
+        for (IToken token : tokenList) {
+            if (token instanceof IOperand)
+                balance ++;
+            else if (token instanceof BinaryOperator)
+                balance --;
+        }
+        balance --;
+        if (balance != 0)
+            throw new CalculatorException(CalculatorException.Type.OPERATOR_BALANCE);
     }
 }

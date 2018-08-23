@@ -9,7 +9,7 @@ public enum UnaryOperator implements IUnaryOperator {
 
     MINUS('-', 3) {
         @Override
-        public float apply(IOperand o) {
+        public double apply(IOperand o) {
             return - o.getValue();
         }
     };

@@ -70,7 +70,7 @@ public class AsyncCalculator {
     public interface CalculationListener {
         void onStart();
         void onError(Exception e);
-        void onStop(float result);
+        void onStop(double result);
     }
 
     private class CalculationTask implements Runnable {
@@ -99,7 +99,7 @@ public class AsyncCalculator {
                 else
                     return;
 
-                float result;
+                double result;
                 if (!Thread.currentThread().isInterrupted())
                     result = mCalculator.calculate(rpnQueue);
                 else
