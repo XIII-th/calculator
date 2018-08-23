@@ -1,6 +1,7 @@
 package com.xiiilab.calculator.core;
 
-import androidx.annotation.NonNull;
+
+import android.support.annotation.NonNull;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -24,8 +25,7 @@ public class InputPreprocessor {
 
     private final String mTokenSplitRegex;
 
-    public InputPreprocessor(TokenProcessor tokenProcessor) {
-        Set<Character> operatorSet = tokenProcessor.getSupportedOperators();
+    public InputPreprocessor(Set<Character> operatorSet) {
         // build complete operators string
         StringBuilder builder = new StringBuilder(operatorSet.size());
         for (Character character : operatorSet) {

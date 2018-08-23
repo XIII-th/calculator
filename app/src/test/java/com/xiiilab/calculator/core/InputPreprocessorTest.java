@@ -8,7 +8,8 @@ import org.junit.Test;
 import java.util.Random;
 import java.util.function.Function;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by XIII-th on 15.08.2018
@@ -28,7 +29,7 @@ public class InputPreprocessorTest {
     private static final Random RANDOM = new Random();
     private static final char[] SPACE_CHARS = {' ', '\t', '\n'};
     private static final byte MAX_SPACE_COUNT = 5;
-    private static final InputPreprocessor INPUT_PREPROCESSOR = new InputPreprocessor(TOKEN_PROCESSOR);
+    private static final InputPreprocessor INPUT_PREPROCESSOR = new InputPreprocessor(TOKEN_PROCESSOR.getSupportedOperators());
 
     @Test(expected = IllegalArgumentException.class)
     public void removeSpaces_emptyString() {
