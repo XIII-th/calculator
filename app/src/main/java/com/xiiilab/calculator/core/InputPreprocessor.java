@@ -3,6 +3,7 @@ package com.xiiilab.calculator.core;
 
 import android.support.annotation.NonNull;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -38,7 +39,11 @@ public class InputPreprocessor {
     }
 
     public String[] getStringTokens(@NonNull String expression) {
-        return removeSpaces(expression).split(mTokenSplitRegex);
+        String[] tokens = removeSpaces(expression).split(mTokenSplitRegex);
+        // remove empty token if present. Expression starts with operator
+        if (tokens.length > 0 && tokens[0].isEmpty())
+            tokens = Arrays.copyOfRange(tokens, 1, tokens.length);
+        return tokens;
     }
 
     public String removeSpaces(@NonNull String expression) {

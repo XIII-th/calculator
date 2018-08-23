@@ -43,6 +43,10 @@ public class TokenProcessor {
         return characterSet;
     }
 
+    public Queue<IToken> toRpn(String... tokens) {
+        return toRpn(toTokenList(tokens));
+    }
+
     protected Queue<IToken> toRpn(List<IToken> tokens) {
         Queue<IToken> out = new LinkedList<>();
         Deque<IToken> stack = new LinkedList<>();
