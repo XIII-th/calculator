@@ -6,4 +6,12 @@
     <string name="bracket_mismatch">Bracket mismatch</string>
     <string name="empty_bracket">Unexpected empty brackets</string>
     <string name="unexpected_sequence_error" formatted="true">Unexpected operator sequence: %s</string>
+    <string name="legend">
+        Available operations:\n
+        🔹 n+n - sum\n
+        🔹 n-n - minus\n
+        🔹 n*n - multiplication\n
+        🔹 n/n - division\n
+        🔹 (-n) - unary minus. \'(\' must precede \'-\' sign
+    </string>
 </resources>

@@ -3,7 +3,10 @@ package com.xiiilab.calculator.core;
 import android.support.annotation.NonNull;
 import com.xiiilab.calculator.core.operand.IOperand;
 import com.xiiilab.calculator.core.operand.Operand;
-import com.xiiilab.calculator.core.operator.*;
+import com.xiiilab.calculator.core.operator.Bracket;
+import com.xiiilab.calculator.core.operator.IBinaryOperator;
+import com.xiiilab.calculator.core.operator.IOperator;
+import com.xiiilab.calculator.core.operator.IUnaryOperator;
 
 import java.util.*;
 
@@ -136,10 +139,19 @@ public class TokenProcessor {
     }
 
     protected void checkOperatorSequence(List<IToken> tokenList) {
-        if (tokenList.size() < 2)
+        if (tokenList.isEmpty())
             return;
+
         Iterator<IToken> tokenIterator = tokenList.iterator();
-        IToken left = tokenIterator.next(), center = tokenIterator.next(), right;
+        IToken left = tokenIterator.next();
+        if (tokenList.size() < 2){
+            if (!(left instanceof IOperand))
+                throw getSequenceError(left, null, null);
+            return;
+        }
+        IToken center = tokenIterator.next(), right;
+        if (left instanceof IBinaryOperator)
+            throw getSequenceError(left, center, null);
         if (!tokenIterator.hasNext()) {
             if (center instanceof IOperand)
                 throw getSequenceError(left, center, null);
@@ -162,9 +174,12 @@ public class TokenProcessor {
     }
 
     @NonNull
-    private CalculatorException getSequenceError(IToken left, IToken operator, IToken right) {
+    private CalculatorException getSequenceError(IToken left, IToken center, IToken right) {
         return new CalculatorException(CalculatorException.Type.OPERATOR_SEQUENCE,
-                String.format(Locale.getDefault(), "%s%s%s", left, operator, right == null ? "" : right));
+                String.format(Locale.getDefault(), "%s%s%s",
+                        left == null ? "" : left,
+                        center == null ? "" : center,
+                        right == null ? "" : right));
     }
 
     private boolean leftOperand(IToken left) {
