@@ -82,8 +82,8 @@ public class CalculatorViewModel extends AndroidViewModel implements AsyncCalcul
                 case EMPTY_BRACKET:
                     message = error(R.string.empty_bracket, e);
                     break;
-                case OPERATOR_BALANCE:
-                    message = error(R.string.operator_balance, e);
+                case OPERATOR_SEQUENCE:
+                    message = error(R.string.unexpected_sequence_error, e);
                     break;
                 default:
                     message = error(R.string.unexpected_error, e);

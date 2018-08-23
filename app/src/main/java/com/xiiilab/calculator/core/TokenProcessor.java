@@ -1,11 +1,9 @@
 package com.xiiilab.calculator.core;
 
+import android.support.annotation.NonNull;
 import com.xiiilab.calculator.core.operand.IOperand;
 import com.xiiilab.calculator.core.operand.Operand;
-import com.xiiilab.calculator.core.operator.BinaryOperator;
-import com.xiiilab.calculator.core.operator.Bracket;
-import com.xiiilab.calculator.core.operator.IOperator;
-import com.xiiilab.calculator.core.operator.IUnaryOperator;
+import com.xiiilab.calculator.core.operator.*;
 
 import java.util.*;
 
@@ -47,7 +45,7 @@ public class TokenProcessor {
     public Queue<IToken> toRpn(String... tokens) {
         List<IToken> tokenList = toTokenList(tokens);
         checkBrackets(tokenList);
-        checkOperatorBalance(tokenList);
+        checkOperatorSequence(tokenList);
         return toRpn(tokenList);
     }
 
@@ -67,8 +65,7 @@ public class TokenProcessor {
                     out.add(op);
                 if (op != Bracket.LEFT)
                     throw new IllegalStateException("Unable to obtain open bracket");
-            }
-            else if (token instanceof IOperator) {
+            } else if (token instanceof IOperator) {
                 IToken op;
                 while ((op = stack.peekLast()) != null && op.getPriority() >= token.getPriority() && op != Bracket.LEFT)
                     out.add(stack.pollLast());
@@ -124,7 +121,7 @@ public class TokenProcessor {
         IToken prev = null;
         for (IToken token : tokenList) {
             if (token == Bracket.LEFT)
-                counter ++;
+                counter++;
             else if (token == Bracket.RIGHT) {
                 if (prev == Bracket.LEFT)
                     throw new CalculatorException(CalculatorException.Type.EMPTY_BRACKET);
@@ -138,16 +135,43 @@ public class TokenProcessor {
             throw new CalculatorException(CalculatorException.Type.BRACKET_MISMATCH);
     }
 
-    protected void checkOperatorBalance(List<IToken> tokenList) {
-        int balance = 0;
-        for (IToken token : tokenList) {
-            if (token instanceof IOperand)
-                balance ++;
-            else if (token instanceof BinaryOperator)
-                balance --;
+    protected void checkOperatorSequence(List<IToken> tokenList) {
+        if (tokenList.size() < 2)
+            return;
+        Iterator<IToken> tokenIterator = tokenList.iterator();
+        IToken left = tokenIterator.next(), center = tokenIterator.next(), right;
+        if (!tokenIterator.hasNext()) {
+            if (center instanceof IOperand)
+                throw getSequenceError(left, center, null);
+        } else while (tokenIterator.hasNext()) {
+            right = tokenIterator.next();
+            // TODO: replace to predicate's set
+            if (center instanceof IBinaryOperator && (!leftOperand(left) || !rightOperand(right)))
+                throw getSequenceError(left, center, right);
+            else if (center instanceof IUnaryOperator && (left != Bracket.LEFT || !rightOperand(right)))
+                throw getSequenceError(left, center, right);
+            else if (center == Bracket.LEFT && leftOperand(left))
+                throw getSequenceError(left, center, right);
+            else if (center == Bracket.RIGHT && rightOperand(right))
+                throw getSequenceError(left, center, right);
+            left = center;
+            center = right;
         }
-        balance --;
-        if (balance != 0)
-            throw new CalculatorException(CalculatorException.Type.OPERATOR_BALANCE);
+        if (!(center instanceof IOperand) && center != Bracket.RIGHT)
+            throw getSequenceError(left, center, null);
+    }
+
+    @NonNull
+    private CalculatorException getSequenceError(IToken left, IToken operator, IToken right) {
+        return new CalculatorException(CalculatorException.Type.OPERATOR_SEQUENCE,
+                String.format(Locale.getDefault(), "%s%s%s", left, operator, right == null ? "" : right));
+    }
+
+    private boolean leftOperand(IToken left) {
+        return left == Bracket.RIGHT || left instanceof IOperand;
+    }
+
+    private boolean rightOperand(IToken right) {
+        return right == Bracket.LEFT || right instanceof IOperand;
     }
 }

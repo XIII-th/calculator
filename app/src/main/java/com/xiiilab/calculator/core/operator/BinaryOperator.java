@@ -53,6 +53,6 @@ public enum BinaryOperator implements IBinaryOperator {
 
     @Override
     public String toString() {
-        return getSymbol() + "b";
+        return String.valueOf(getSymbol());
     }
 }

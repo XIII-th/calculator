@@ -4,6 +4,6 @@
     <string name="unexpected_error" formatted="true">Unexpected error: %s</string>
     <string name="number_format_error" formatted="true">Number format error: %s</string>
     <string name="bracket_mismatch">Bracket mismatch</string>
-    <string name="operator_balance">Operator and operand balance mismatch</string>
     <string name="empty_bracket">Unexpected empty brackets</string>
+    <string name="unexpected_sequence_error" formatted="true">Unexpected operator sequence: %s</string>
 </resources>

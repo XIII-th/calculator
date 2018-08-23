@@ -20,6 +20,6 @@ public class CalculatorException extends IllegalArgumentException {
         NUMBER_FORMAT,
         BRACKET_MISMATCH,
         EMPTY_BRACKET,
-        OPERATOR_BALANCE
+        OPERATOR_SEQUENCE,
     }
 }

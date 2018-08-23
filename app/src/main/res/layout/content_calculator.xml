@@ -34,6 +34,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textShortMessage"
+                    android:digits="1234567890.+-*/()"
                     android:text="@={vm.expression}"
                     android:enabled="@{!safeUnbox(vm.inProgress)}"/>
         </android.support.design.widget.TextInputLayout>

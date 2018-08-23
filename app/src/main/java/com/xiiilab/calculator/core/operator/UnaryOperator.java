@@ -32,9 +32,8 @@ public enum UnaryOperator implements IUnaryOperator {
         return mPriority;
     }
 
-
     @Override
     public String toString() {
-        return getSymbol() + "u";
+        return String.valueOf(getSymbol());
     }
 }
