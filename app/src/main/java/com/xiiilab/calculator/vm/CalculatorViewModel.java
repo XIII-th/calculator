@@ -49,4 +49,9 @@ public class CalculatorViewModel extends ViewModel {
     public void calculate() {
         mCalculator.calculate(getExpression(), mCalculationListener);
     }
+
+    @Override
+    protected void onCleared() {
+        mCalculator.shutdown();
+    }
 }

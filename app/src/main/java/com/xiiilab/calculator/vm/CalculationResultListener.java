@@ -24,6 +24,8 @@ class CalculationResultListener implements AsyncCalculator.CalculationListener {
 
     @Override
     public void onStart() {
+        mExpressionError.postValue(null);
+        mResult.postValue(null);
         mInProgress.postValue(Boolean.TRUE);
     }
 
