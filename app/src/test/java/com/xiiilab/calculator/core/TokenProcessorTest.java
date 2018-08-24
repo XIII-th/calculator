@@ -172,22 +172,6 @@ public class TokenProcessorTest {
         }
     }
 
-    @Test(expected = CalculatorException.class)
-    public void operatorBalance() {
-        try {
-            List<IToken> tokenList = new LinkedList<>();
-            tokenList.add(new Operand("1"));
-            tokenList.add(BinaryOperator.PLUS);
-            tokenList.add(BinaryOperator.PLUS);
-            tokenList.add(new Operand("1"));
-            TOKEN_PROCESSOR_SUPPLIER.get().checkOperatorBalance(tokenList);
-        } catch (CalculatorException e) {
-            if (e.mType != CalculatorException.Type.OPERATOR_BALANCE)
-                fail("Unexpected error type " + e.mType);
-            throw e;
-        }
-    }
-
     private void addOperatorsTest(IOperator... operators) {
         TokenProcessor processor = new TokenProcessor();
         if (operators instanceof IBinaryOperator[])
